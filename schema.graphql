@@ -145,7 +145,7 @@ type UserDescription @entity(immutable: true) {
   about: String
   skills_raw: String
   skills: [Keyword!]
-  credentials: [CredentialWrapper!]
+  credentials: String
   timezone: BigInt
   headline: String
   country: String

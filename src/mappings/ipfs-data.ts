@@ -120,6 +120,10 @@ export function handleUserData(content: Bytes): void {
   if (skills !== null) {
     description.skills_raw = skills.toLowerCase()
   }
+  const credentials = getValueAsObject(jsonObject, 'credentials')
+  if (credentials !== null) {
+    description.credentials = JSON.stringify(credentials)
+  }
   description.timezone = getValueAsBigInt(jsonObject, 'timezone')
   description.headline = getValueAsString(jsonObject, 'headline')
   description.country = getValueAsString(jsonObject, 'country')
