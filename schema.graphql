@@ -1,8 +1,8 @@
 enum ServiceStatus {
-  Opened,
-  Confirmed,
-  Finished,
-  Cancelled,
+  Opened
+  Confirmed
+  Finished
+  Cancelled
   Uncompleted
 }
 
@@ -105,12 +105,47 @@ type UserStats @entity {
   user: User! # Corresponding user
 }
 
+type Claim @entity(immutable: true) {
+  id: ID!
+  platform: String! # example "github.com"
+  criteria: String! # example "totalCommits"
+  condition: String! # example >=, ==, in, <, etc
+  value: String! # example 30, ["java", "css"], etc
+}
+
+type ClaimsEncrypted @entity(immutable: true) {
+  id: ID!
+  cipherText: String! # the cipher text generated using lit encrypted
+  accessControlCondition: String! # the lit access control condition
+}
+
+type Credential @entity(immutable: true) {
+  id: ID!
+  author: String! # the writer of the credential, for example "Talentlayer Core Team"
+  platform: String! # example "github.com"
+  description: String! # the description of the credential
+  issueTime: Int! # the issue time of the credential
+  expiryTime: Int! # the expiry time of the credential
+  userAddress: String! # user address to whom the credential is issued
+  claims: [Claim!] # the unencrypted claims
+  claimsEncrypted: ClaimsEncrypted # the encrypted claims obj
+}
+
+type CredentialWrapper @entity(immutable: true) {
+  id: ID!
+  issuer: String! # the signer of the credential (talentlayer signer public address)
+  signature1: String! # the sign of the hash of credential object after removing claims
+  signature2: String! # the sign of the hash of complete credential object
+  creential: Credential! # the credential object
+}
+
 type UserDescription @entity(immutable: true) {
   id: ID! #cid
   title: String
   about: String
   skills_raw: String
   skills: [Keyword!]
+  credentials: [CredentialWrapper!]
   timezone: BigInt
   headline: String
   country: String
