@@ -7,6 +7,10 @@ import {
   ReviewDescription,
   UserWeb3mailPreferences,
   EvidenceDescription,
+  CredentialWrapper,
+  Credential,
+  ClaimsEncrypted,
+  Claim,
 } from '../../generated/schema'
 import { getOrCreateKeyword } from '../getters'
 
@@ -120,9 +124,98 @@ export function handleUserData(content: Bytes): void {
   if (skills !== null) {
     description.skills_raw = skills.toLowerCase()
   }
-  const credentials = getValueAsObject(jsonObject, 'credentials')
+  const credentials = getValueAsArray(jsonObject, 'credentials')
+
   if (credentials !== null) {
-    description.credentials = JSON.stringify(credentials)
+    const credIds: string[] = []
+    for (let i = 0; i < credentials.length; i++) {
+      const credentialWrapped = credentials[i]
+      const credentialWrappedObj = credentialWrapped.toObject()
+      const credentialObj = getValueAsObject(credentialWrappedObj, 'credential')
+      if (credentialObj === null) {
+        continue
+      }
+      const issuer = getValueAsString(credentialWrappedObj, 'issuer')
+      const signature1 = getValueAsString(credentialWrappedObj, 'signature1')
+      const signature2 = getValueAsString(credentialWrappedObj, 'signature2')
+      const author = getValueAsString(credentialObj, 'author')
+      const platform = getValueAsString(credentialObj, 'platform')
+      const description = getValueAsString(credentialObj, 'description')
+      const issueTime = getValueAsBigInt(credentialObj, 'issueTime')
+      const expiryTime = getValueAsBigInt(credentialObj, 'expiryTime')
+      const userAddress = getValueAsString(credentialObj, 'userAddress')
+      const claims = getValueAsArray(credentialObj, 'claims')
+      const claimsEncryptedObj = getValueAsObject(credentialObj, 'claimsEncrypted')
+
+      if (
+        issuer === null ||
+        signature1 === null ||
+        signature2 === null ||
+        author === null ||
+        platform === null ||
+        description === null ||
+        issueTime === null ||
+        expiryTime === null ||
+        userAddress === null ||
+        (claims === null && claimsEncryptedObj === null)
+      )
+        continue
+
+      const credId = `cred-${id}-${author}-${platform}`
+
+      const credentialEntity = new Credential(credId)
+      credentialEntity.author = author
+      credentialEntity.platform = platform
+      credentialEntity.description = description
+      credentialEntity.issueTime = issueTime.toI32()
+      credentialEntity.expiryTime = expiryTime.toI32()
+      credentialEntity.userAddress = userAddress
+      if (claimsEncryptedObj !== null) {
+        const cipherText = getValueAsString(claimsEncryptedObj, 'cipherText')
+        const accessControlCondition = getValueAsString(claimsEncryptedObj, 'accessControlCondition')
+
+        if (cipherText === null || accessControlCondition === null) {
+          continue
+        }
+        const claimsEncrypted = new ClaimsEncrypted(credId)
+        claimsEncrypted.cipherText = cipherText
+        claimsEncrypted.accessControlCondition = accessControlCondition
+        claimsEncrypted.save()
+
+        credentialEntity.claimsEncrypted = credId
+      }
+      if (claims !== null) {
+        const claimIds: string[] = []
+        for (let j = 0; j < claims.length; j++) {
+          const claim = claims[j]
+          const claimObj = claim.toObject()
+          const platform = getValueAsString(claimObj, 'platform')
+          const criteria = getValueAsString(claimObj, 'criteria')
+          const condition = getValueAsString(claimObj, 'condition')
+          const value = getValueAsString(claimObj, 'value')
+          if (platform === null || criteria === null || condition === null || value === null) continue
+          const claimId = `${credId}-${criteria}`
+          const claimEntity = new Claim(claimId)
+          claimEntity.platform = platform
+          claimEntity.criteria = criteria
+          claimEntity.condition = condition
+          claimEntity.value = value
+          claimEntity.save()
+          claimIds.push(claimId)
+        }
+        credentialEntity.claims = claimIds
+      }
+      credentialEntity.save()
+
+      const credentialWrapperEntity = new CredentialWrapper(credId)
+      credentialWrapperEntity.credential = credId
+      credentialWrapperEntity.issuer = issuer
+      credentialWrapperEntity.signature1 = signature1
+      credentialWrapperEntity.signature2 = signature2
+      credentialWrapperEntity.save()
+      credIds.push(credId)
+    }
+    description.credentials = credIds
   }
   description.timezone = getValueAsBigInt(jsonObject, 'timezone')
   description.headline = getValueAsString(jsonObject, 'headline')
@@ -227,6 +320,16 @@ function getValueAsObject(jsonObject: TypedMap<string, JSONValue>, key: string):
   }
 
   return value.toObject()
+}
+
+function getValueAsArray(jsonObject: TypedMap<string, JSONValue>, key: string): JSONValue[] | null {
+  const value = jsonObject.get(key)
+
+  if (value == null || value.isNull() || value.kind != JSONValueKind.ARRAY) {
+    return null
+  }
+
+  return value.toArray()
 }
 
 function getValueAsString(jsonObject: TypedMap<string, JSONValue>, key: string): string | null {

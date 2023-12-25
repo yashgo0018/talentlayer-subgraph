@@ -136,7 +136,7 @@ type CredentialWrapper @entity(immutable: true) {
   issuer: String! # the signer of the credential (talentlayer signer public address)
   signature1: String! # the sign of the hash of credential object after removing claims
   signature2: String! # the sign of the hash of complete credential object
-  creential: Credential! # the credential object
+  credential: Credential! # the credential object
 }
 
 type UserDescription @entity(immutable: true) {
@@ -145,7 +145,7 @@ type UserDescription @entity(immutable: true) {
   about: String
   skills_raw: String
   skills: [Keyword!]
-  credentials: String
+  credentials: [CredentialWrapper!]
   timezone: BigInt
   headline: String
   country: String

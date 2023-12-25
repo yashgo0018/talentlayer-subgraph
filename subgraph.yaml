@@ -9,7 +9,7 @@ dataSources:
     network: mumbai
     source:
       abi: TalentLayerID
-      address: '0x3F87289e6Ec2D05C32d8A74CCfb30773fF549306'
+      address: "0x3F87289e6Ec2D05C32d8A74CCfb30773fF549306"
       startBlock: 33676850
     mapping:
       kind: ethereum/events
@@ -44,10 +44,10 @@ dataSources:
       file: ./src/mappings/talent-layer-id.ts
   - kind: ethereum/contract
     name: TalentLayerReview
-    network: localhost
+    network: mumbai
     source:
       abi: TalentLayerReview
-      address: '0x050F59E1871d3B7ca97e6fb9DCE64b3818b14B18'
+      address: "0x050F59E1871d3B7ca97e6fb9DCE64b3818b14B18"
       startBlock: 33676850
     mapping:
       kind: ethereum/events
@@ -73,10 +73,10 @@ dataSources:
       file: ./src/mappings/talent-layer-review.ts
   - kind: ethereum/contract
     name: TalentLayerService
-    network: localhost
+    network: mumbai
     source:
       abi: TalentLayerService
-      address: '0x27ED516dC1df64b4c1517A64aa2Bb72a434a5A6D'
+      address: "0x27ED516dC1df64b4c1517A64aa2Bb72a434a5A6D"
       startBlock: 33676850
     mapping:
       kind: ethereum/events
@@ -107,10 +107,10 @@ dataSources:
       file: ./src/mappings/talent-layer-service.ts
   - kind: ethereum/contract
     name: TalentLayerEscrow
-    network: localhost
+    network: mumbai
     source:
       abi: TalentLayerEscrow
-      address: '0x4bE920eC3e8552292B2147480111063E0dc36872'
+      address: "0x4bE920eC3e8552292B2147480111063E0dc36872"
       startBlock: 33676850
     mapping:
       kind: ethereum/events
@@ -160,10 +160,10 @@ dataSources:
       file: ./src/mappings/talent-layer-escrow.ts
   - kind: ethereum/contract
     name: TalentLayerPlatformID
-    network: localhost
+    network: mumbai
     source:
       abi: TalentLayerPlatformID
-      address: '0xEFD8dbC421380Ee04BAdB69216a0FD97F64CbFD4'
+      address: "0xEFD8dbC421380Ee04BAdB69216a0FD97F64CbFD4"
       startBlock: 33676850
     mapping:
       kind: ethereum/events
@@ -224,7 +224,7 @@ templates:
       abis:
         - name: TalentLayerService
           file: ./abis/TalentLayerService.json
-    network: localhost
+    network: mumbai
   - name: ProposalData
     kind: file/ipfs
     mapping:
@@ -237,7 +237,7 @@ templates:
       abis:
         - name: TalentLayerService
           file: ./abis/TalentLayerService.json
-    network: localhost
+    network: mumbai
   - name: ReviewData
     kind: file/ipfs
     mapping:
@@ -250,7 +250,7 @@ templates:
       abis:
         - name: TalentLayerReview
           file: ./abis/TalentLayerReview.json
-    network: localhost
+    network: mumbai
   - name: UserData
     kind: file/ipfs
     mapping:
@@ -262,10 +262,14 @@ templates:
         - UserDescription
         - UserWeb3mailPreferences
         - Keyword
+        - Credential
+        - CredentialWrapper
+        - Claim
+        - ClaimEncrypted
       abis:
         - name: TalentLayerID
           file: ./abis/TalentLayerID.json
-    network: localhost
+    network: mumbai
   - name: PlatformData
     kind: file/ipfs
     mapping:
@@ -278,7 +282,7 @@ templates:
       abis:
         - name: TalentLayerPlatformID
           file: ./abis/TalentLayerPlatformID.json
-    network: localhost
+    network: mumbai
   - name: EvidenceData
     kind: file/ipfs
     mapping:
@@ -291,4 +295,4 @@ templates:
       abis:
         - name: TalentLayerEscrow
           file: ./abis/TalentLayerEscrow.json
-    network: localhost
+    network: mumbai
